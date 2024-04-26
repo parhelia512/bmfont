@@ -59,7 +59,7 @@ func parseDescriptor(filename string, r io.Reader) (*Descriptor, error) {
 				File: tag.stringAttr("file"),
 			}
 		case "char":
-			id := rune(tag.intAttr("id"))
+			id := tag.runeAttr("id")
 			font.Chars[id] = Char{
 				ID:       id,
 				X:        tag.intAttr("x"),
@@ -72,8 +72,8 @@ func parseDescriptor(filename string, r io.Reader) (*Descriptor, error) {
 			}
 		case "kerning":
 			pair := CharPair{
-				First:  rune(tag.intAttr("first")),
-				Second: rune(tag.intAttr("second")),
+				First:  tag.runeAttr("first"),
+				Second: tag.runeAttr("second"),
 			}
 			font.Kerning[pair] = Kerning{
 				Amount: tag.intAttr("amount"),
@@ -197,6 +197,11 @@ type tag struct {
 func (t *tag) intAttr(name string) int {
 	value, _ := strconv.Atoi(t.stringAttr(name))
 	return value
+}
+
+func (t *tag) runeAttr(name string) rune {
+	value, _ := strconv.ParseInt(t.stringAttr(name), 10, 32)
+	return rune(value)
 }
 
 func (t *tag) stringAttr(name string) string {
